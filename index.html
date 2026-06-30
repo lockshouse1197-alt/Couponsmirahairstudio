@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MIRA HAIR STUDIO - Coupons</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0A3B31;
+            --primary-light: #165c4d;
+            --accent: #D4AF37;
+            --bg: #F8FAFC;
+            --surface: #FFFFFF;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+        }
+
+        body { font-family: 'Prompt', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--text-dark); display: flex; justify-content: center; min-height: 100vh; }
+        .app-card { background: var(--bg); width: 100%; max-width: 480px; overflow: hidden; display: flex; flex-direction: column; }
+        
+        .header { background: var(--primary); color: white; padding: 30px 20px; text-align: center; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .header img { max-height: 60px; margin-bottom: 10px; border-radius: 4px; display: none; margin-left: auto; margin-right: auto; }
+        .header h2 { margin: 0; font-size: 1.3rem; letter-spacing: 1px; font-weight: 600; text-transform: uppercase; }
+        
+        .user-info { background: rgba(255,255,255,0.1); padding: 12px; margin-top: 15px; border-radius: 8px; font-weight: 400; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.15); }
+        .user-info strong { color: var(--accent); font-size: 1.1rem; }
+        
+        .content { padding: 15px 0; flex: 1; }
+        
+        .login-box { background: var(--surface); padding: 25px 20px; border-radius: 12px; text-align: center; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        input { width: 100%; padding: 14px; border: 1px solid #CBD5E1; border-radius: 8px; font-family: 'Prompt'; font-size: 1rem; box-sizing: border-box; text-align: center; outline: none; transition: 0.2s; background: #F1F5F9; margin-bottom: 15px; }
+        input:focus { border-color: var(--primary); background: #fff; }
+        
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-family: 'Prompt'; font-size: 1rem; font-weight: 600; color: white; cursor: pointer; transition: 0.2s; background: var(--primary); letter-spacing: 0.5px; }
+        .btn:active { transform: scale(0.98); background: var(--primary-light); }
+
+        /* 🌟 ระบบแท็บ (Tabs) 🌟 */
+        .tabs { display: flex; background: var(--surface); border-radius: 10px; padding: 5px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .tab-btn { flex: 1; text-align: center; padding: 10px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.2s; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .tab-badge { background: #DC2626; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; margin-left: 5px; vertical-align: top; }
+        
+        .coupon-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .coupon-item { background: var(--surface); border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; flex-direction: column; border: 1px solid #F1F5F9; }
+        .coupon-img { width: 100%; height: 100px; object-fit: cover; background: #f4f4f4; border-bottom: 1px solid #f1f5f9; }
+        .coupon-body { padding: 10px; display: flex; flex-direction: column; flex: 1; }
+        .coupon-title { font-weight: 600; font-size: 0.85rem; color: var(--text-dark); margin-bottom: 4px; line-height: 1.3; }
+        .coupon-desc { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 10px; line-height: 1.3; }
+        .coupon-pts { font-size: 0.7rem; color: var(--primary-light); font-weight: 600; margin-bottom: 4px; }
+        .coupon-expiry { color: #D32F2F; font-size: 0.65rem; margin-bottom: 8px; }
+        
+        .quota-box { margin-bottom: 10px; margin-top: auto; }
+        .quota-text { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-muted); margin-bottom: 4px; }
+        .progress-bar { width: 100%; height: 4px; background: #F1F5F9; border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary-light); border-radius: 2px; }
+        
+        .btn-claim { background: var(--primary); color: white; border: none; padding: 8px; border-radius: 6px; font-family: 'Prompt'; font-weight: 500; font-size: 0.8rem; cursor: pointer; width: 100%; margin-top: auto; }
+        .btn-claim:disabled { background: #E2E8F0; color: #94A3B8; cursor: not-allowed; }
+        
+        /* สไตล์สำหรับปุ่มกดใช้งานคูปองของฉัน */
+        .btn-use { background: #F59E0B; color: white; border: none; padding: 8px; border-radius: 6px; font-family: 'Prompt'; font-weight: 600; font-size: 0.85rem; cursor: pointer; width: 100%; margin-top: auto; box-shadow: 0 2px 5px rgba(245, 158, 11, 0.2); }
+        .btn-use:active { background: #D97706; transform: scale(0.98); }
+
+        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.9); z-index: 1000; display: flex; justify-content: center; align-items: center; flex-direction: column; display: none; }
+        .spinner { width: 40px; height: 40px; border: 3px solid #E2E8F0; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* สำหรับจอเล็กมากๆ */
+        @media (max-width: 360px) {
+            .coupon-list { grid-template-columns: 1fr; }
+            .coupon-img { height: 120px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-card">
+        <div class="header">
+            <img id="shopLogo" src="" alt="Logo">
+            <h2 id="shopNameDisplay">MIRA HAIR STUDIO</h2>
+            
+            <div id="userInfoBox" style="display:none;">
+                <div class="user-info">
+                    สวัสดีคุณ <span id="lblCustomerName" style="color:var(--accent); font-weight:600;">-</span><br>
+                    แต้มสะสม: <strong id="lblCustomerPoints">0</strong> แต้ม
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div id="loginZone" class="login-box">
+                <h3 style="margin-top:0; font-size:1.1rem; font-weight:600;">เข้าสู่ระบบสมาชิก</h3>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">กรุณากรอกเบอร์โทรศัพท์เพื่อตรวจสอบสิทธิ์</p>
+                <input type="tel" id="txtPhone" placeholder="เบอร์โทรศัพท์ 10 หลัก" maxlength="10">
+                <button class="btn" onclick="loginAction()">เข้าสู่ระบบ</button>
+            </div>
+
+            <div id="couponZone" style="display:none;">
+                <div class="tabs">
+                    <div class="tab-btn active" id="tabNew" onclick="switchTab('new')">คูปองน่าสนใจ</div>
+                    <div class="tab-btn" id="tabMy" onclick="switchTab('my')">คูปองของฉัน <span class="tab-badge" id="myCouponBadge" style="display:none;">0</span></div>
+                </div>
+
+                <div class="coupon-list" id="couponContainer"></div>
+
+                <div class="coupon-list" id="myCouponContainer" style="display:none;"></div>
+                
+                <button class="btn" style="background:#94A3B8; margin-top:25px;" onclick="logout()">ออกจากระบบ</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 🔴 1. ใส่ URL Web App ระบบคูปองที่นี่
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvbMGagD28gINmsuEVquagxgk8eFGoMLynAqlzu6OvnJAcDJh1bt2b3bincp6Y-o8/exec"; 
+        
+        // 🔴 2. ตั้งชื่อร้าน และ URL โลโก้
+        const SHOP_NAME = "MIRA HAIR STUDIO";
+        const LOGO_URL = ""; 
+
+        let userPhone = "";
+        let globalMyCoupons = []; // เก็บอาร์เรย์คูปองของฉันไว้ใช้วาดแท็บ
+
+        window.onload = function() {
+            document.getElementById('shopNameDisplay').innerText = SHOP_NAME;
+            document.title = SHOP_NAME + " - Coupons";
+            if(LOGO_URL && LOGO_URL.trim() !== "") {
+                let logoImg = document.getElementById('shopLogo');
+                logoImg.src = LOGO_URL; logoImg.style.display = "block";
+                document.getElementById('shopNameDisplay').style.display = "none"; 
+            }
+            checkSession(); // เช็คว่าเคยล็อกอินไว้ไหม
+        };
+
+        function showLoading(show) { document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none'; }
+
+        // 🌟 ระบบจำ Session 10 นาที
+        function checkSession() {
+            let savedPhone = localStorage.getItem('mira_coupon_user');
+            let savedTime = localStorage.getItem('mira_coupon_time');
+            if(savedPhone && savedTime) {
+                let now = new Date().getTime();
+                if(now - parseInt(savedTime) < 10 * 60 * 1000) { // 10 นาที
+                    document.getElementById('txtPhone').value = savedPhone;
+                    fetchCoupons(savedPhone); // ล็อกอินอัตโนมัติ
+                    return;
+                }
+            }
+            // ถ้าหมดเวลาให้เคลียร์ทิ้ง
+            localStorage.removeItem('mira_coupon_user');
+            localStorage.removeItem('mira_coupon_time');
+        }
+
+        function saveSession(phone) {
+            localStorage.setItem('mira_coupon_user', phone);
+            localStorage.setItem('mira_coupon_time', new Date().getTime().toString());
+        }
+
+        function logout() {
+            localStorage.removeItem('mira_coupon_user');
+            localStorage.removeItem('mira_coupon_time');
+            location.reload();
+        }
+
+        function loginAction() {
+            let phone = document.getElementById('txtPhone').value.trim();
+            if(!phone || phone.length < 9) return alert("กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้องค่ะ");
+            fetchCoupons(phone);
+        }
+
+        function fetchCoupons(phone) {
+            showLoading(true);
+            userPhone = phone;
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'getAvailableCoupons', payload: { phone: phone } })
+            }).then(r => r.json()).then(res => {
+                showLoading(false);
+                if(res.status === 'success') {
+                    saveSession(phone); // บันทึก Session สำเร็จ
+                    
+                    document.getElementById('loginZone').style.display = 'none';
+                    document.getElementById('userInfoBox').style.display = 'block';
+                    document.getElementById('couponZone').style.display = 'block';
+                    
+                    document.getElementById('lblCustomerName').innerText = res.name;
+                    document.getElementById('lblCustomerPoints').innerText = res.points.toLocaleString();
+                    
+                    globalMyCoupons = res.myCoupons || []; // รับรายการคูปองของฉันมาเก็บไว้
+
+                    // อัปเดตตัวเลขแจ้งเตือนบนแท็บ
+                    let badge = document.getElementById('myCouponBadge');
+                    if(globalMyCoupons.length > 0) {
+                        badge.innerText = globalMyCoupons.length;
+                        badge.style.display = 'inline-block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+
+                    // วาดคูปองทั้ง 2 แท็บ
+                    renderAvailableCoupons(res.coupons, res.points);
+                    renderMyCoupons();
+                } else {
+                    alert(res.msg);
+                    logout(); // ล็อกอินไม่ผ่านให้ลบเซสชัน
+                }
+            }).catch(e => { showLoading(false); alert("การเชื่อมต่อล้มเหลว"); });
+        }
+
+        function switchTab(tab) {
+            if(tab === 'new') {
+                document.getElementById('tabNew').classList.add('active');
+                document.getElementById('tabMy').classList.remove('active');
+                document.getElementById('couponContainer').style.display = 'grid';
+                document.getElementById('myCouponContainer').style.display = 'none';
+            } else {
+                document.getElementById('tabMy').classList.add('active');
+                document.getElementById('tabNew').classList.remove('active');
+                document.getElementById('myCouponContainer').style.display = 'grid';
+                document.getElementById('couponContainer').style.display = 'none';
+            }
+        }
+
+        // วาดแท็บ "คูปองน่าสนใจ"
+        function renderAvailableCoupons(coupons, currentPoints) {
+            let container = document.getElementById('couponContainer');
+            container.innerHTML = '';
+            
+            if(coupons.length === 0) {
+                container.style.display = "block";
+                container.innerHTML = '<div style="text-align:center; color:#888; padding:30px; background:#fff; border-radius:12px; font-size:0.9rem;">ยังไม่มีคูปองใหม่ในขณะนี้</div>';
+                return;
+            }
+
+            container.style.display = "grid"; 
+
+            coupons.forEach(cp => {
+                let canAfford = currentPoints >= cp.pointsRequired;
+                let isSoldOut = (cp.quota > 0 && cp.claimedCount >= cp.quota);
+                
+                let btnHtml = '';
+                if (isSoldOut) {
+                    btnHtml = `<button class="btn-claim btn-soldout">สิทธิ์เต็ม</button>`;
+                } else if (!canAfford && cp.pointsRequired > 0) {
+                    btnHtml = `<button class="btn-claim" style="background:#E2E8F0; color:#94A3B8;" disabled>แต้มไม่พอ</button>`;
+                } else {
+                    btnHtml = `<button class="btn-claim" onclick="claim('${cp.id}', ${cp.pointsRequired})">เก็บคูปอง</button>`;
+                }
+
+                let ptsLabel = cp.pointsRequired > 0 ? `ใช้ ${cp.pointsRequired} แต้ม` : 'รับฟรี';
+                let expiryLabel = cp.expiry !== "ไม่มีวันหมดอายุ" ? `หมดอายุ: ${cp.expiry}` : '';
+                
+                let quotaHtml = '';
+                if (cp.quota > 0) {
+                    let percent = (cp.claimedCount / cp.quota) * 100;
+                    if(percent > 100) percent = 100;
+                    let fillClass = percent >= 100 ? 'progress-fill full' : 'progress-fill';
+                    quotaHtml = `
+                        <div class="quota-box">
+                            <div class="quota-text"><span>รับแล้ว ${cp.claimedCount}</span><span>เหลือ ${cp.quota - cp.claimedCount}</span></div>
+                            <div class="progress-bar"><div class="${fillClass}" style="width: ${percent}%;"></div></div>
+                        </div>`;
+                }
+
+                container.innerHTML += `
+                    <div class="coupon-item">
+                        <img src="${cp.imgUrl}" class="coupon-img" onerror="this.src='https://placehold.co/300x200/F1F5F9/94A3B8?text=NO+IMAGE'">
+                        <div class="coupon-body">
+                            <div class="coupon-title">${cp.title}</div>
+                            <div class="coupon-desc">${cp.desc}</div>
+                            <div class="coupon-pts">${ptsLabel}</div>
+                            <div class="coupon-expiry">${expiryLabel}</div>
+                            ${quotaHtml}
+                            ${btnHtml}
+                        </div>
+                    </div>`;
+            });
+        }
+
+        // วาดแท็บ "คูปองของฉัน"
+        function renderMyCoupons() {
+            let container = document.getElementById('myCouponContainer');
+            container.innerHTML = '';
+            
+            if(globalMyCoupons.length === 0) {
+                container.style.display = "block";
+                container.innerHTML = '<div style="text-align:center; color:#888; padding:30px; background:#fff; border-radius:12px; font-size:0.9rem;">คุณยังไม่ได้เก็บคูปองค่ะ</div>';
+                return;
+            }
+
+            container.style.display = "grid"; 
+
+            globalMyCoupons.forEach(cp => {
+                let expiryLabel = cp.expiry !== "ไม่มีวันหมดอายุ" ? `หมดอายุ: ${cp.expiry}` : '';
+                
+                // คูปองที่อยู่ในแท็บนี้ จะมีปุ่ม "กดใช้งานคูปอง"
+                container.innerHTML += `
+                    <div class="coupon-item" style="border-color: #D4AF37;">
+                        <img src="${cp.imgUrl}" class="coupon-img" onerror="this.src='https://placehold.co/300x200/F1F5F9/94A3B8?text=NO+IMAGE'">
+                        <div class="coupon-body">
+                            <div class="coupon-title">${cp.title}</div>
+                            <div class="coupon-desc">${cp.desc}</div>
+                            <div class="coupon-expiry">${expiryLabel}</div>
+                            
+                            <button class="btn-use" onclick="useCoupon('${cp.id}')">กดใช้งานคูปอง</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function claim(couponId, pointsRequired) {
+            if(pointsRequired > 0) {
+                if(!confirm(`ใช้ ${pointsRequired} แต้มสะสมเพื่อแลกคูปองนี้ ยืนยันหรือไม่?`)) return;
+            }
+            saveSession(userPhone); // ต่ออายุเซสชันตอนทำรายการ
+            showLoading(true);
+            
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'claimCoupon', payload: { phone: userPhone, couponId: couponId, pointsRequired: pointsRequired } })
+            }).then(r => r.json()).then(res => {
+                if(res.status === 'success') {
+                    alert(res.msg);
+                    fetchCoupons(userPhone); // โหลดใหม่เพื่อย้ายคูปองไปอยู่แท็บของฉัน
+                } else {
+                    showLoading(false);
+                    alert(res.msg);
+                }
+            }).catch(e => { showLoading(false); alert("ทำรายการไม่สำเร็จ"); });
+        }
+
+        // 🌟 ฟังก์ชันส่งคำสั่งใช้งานคูปองไปตัดสต๊อก
+        function useCoupon(couponId) {
+            if(!confirm(`⚠️ กรุณากดปุ่มนี้ต่อหน้าพนักงานที่ร้านเท่านั้น!\n\nคุณแน่ใจหรือไม่ว่าต้องการใช้งานคูปองนี้?`)) return;
+            
+            saveSession(userPhone);
+            showLoading(true);
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'useCoupon', payload: { phone: userPhone, couponId: couponId } })
+            }).then(r => r.json()).then(res => {
+                if(res.status === 'success') {
+                    alert(res.msg);
+                    fetchCoupons(userPhone); // โหลดใหม่เพื่อให้คูปองนี้หายไปจากหน้าจอ
+                } else {
+                    showLoading(false);
+                    alert(res.msg);
+                }
+            }).catch(e => { showLoading(false); alert("ทำรายการไม่สำเร็จ"); });
+        }
+    </script>
+</body>
+</html>

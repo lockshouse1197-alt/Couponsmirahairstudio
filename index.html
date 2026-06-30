@@ -35,11 +35,11 @@
         .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-family: 'Prompt'; font-size: 1rem; font-weight: 600; color: white; cursor: pointer; transition: 0.2s; background: var(--primary); letter-spacing: 0.5px; }
         .btn:active { transform: scale(0.98); background: var(--primary-light); }
 
-        /* 🌟 ระบบแท็บ (Tabs) 🌟 */
-        .tabs { display: flex; background: var(--surface); border-radius: 10px; padding: 5px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .tab-btn { flex: 1; text-align: center; padding: 10px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.2s; }
+        /* 🌟 ระบบแท็บเลือกคูปองเพิ่มเป็น 3 ปุ่ม 🌟 */
+        .tabs { display: flex; background: var(--surface); border-radius: 10px; padding: 5px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); gap: 4px; }
+        .tab-btn { flex: 1; text-align: center; padding: 10px 4px; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.2s; white-space: nowrap; }
         .tab-btn.active { background: var(--primary); color: white; }
-        .tab-badge { background: #DC2626; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; margin-left: 5px; vertical-align: top; }
+        .tab-badge { background: #DC2626; color: white; padding: 1px 5px; border-radius: 10px; font-size: 0.65rem; margin-left: 3px; vertical-align: top; }
         
         .coupon-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .coupon-item { background: var(--surface); border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; flex-direction: column; border: 1px solid #F1F5F9; }
@@ -58,18 +58,15 @@
         .btn-claim { background: var(--primary); color: white; border: none; padding: 8px; border-radius: 6px; font-family: 'Prompt'; font-weight: 500; font-size: 0.8rem; cursor: pointer; width: 100%; margin-top: auto; }
         .btn-claim:disabled { background: #E2E8F0; color: #94A3B8; cursor: not-allowed; }
         
-        /* สไตล์สำหรับปุ่มกดใช้งานคูปองของฉัน */
-        .btn-use { background: #F59E0B; color: white; border: none; padding: 8px; border-radius: 6px; font-family: 'Prompt'; font-weight: 600; font-size: 0.85rem; cursor: pointer; width: 100%; margin-top: auto; box-shadow: 0 2px 5px rgba(245, 158, 11, 0.2); }
+        .btn-use { background: #F59E0B; color: white; border: none; padding: 8px; border-radius: 6px; font-family: 'Prompt'; font-weight: 600; font-size: 0.85rem; cursor: pointer; width: 100%; margin-top: auto; }
         .btn-use:active { background: #D97706; transform: scale(0.98); }
 
         .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.9); z-index: 1000; display: flex; justify-content: center; align-items: center; flex-direction: column; display: none; }
         .spinner { width: 40px; height: 40px; border: 3px solid #E2E8F0; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* สำหรับจอเล็กมากๆ */
         @media (max-width: 360px) {
             .coupon-list { grid-template-columns: 1fr; }
-            .coupon-img { height: 120px; }
         }
     </style>
 </head>
@@ -100,11 +97,12 @@
                 <div class="tabs">
                     <div class="tab-btn active" id="tabNew" onclick="switchTab('new')">คูปองน่าสนใจ</div>
                     <div class="tab-btn" id="tabMy" onclick="switchTab('my')">คูปองของฉัน <span class="tab-badge" id="myCouponBadge" style="display:none;">0</span></div>
+                    <div class="tab-btn" id="tabHistory" onclick="switchTab('history')">ประวัติการใช้</div>
                 </div>
 
                 <div class="coupon-list" id="couponContainer"></div>
-
                 <div class="coupon-list" id="myCouponContainer" style="display:none;"></div>
+                <div class="coupon-list" id="historyCouponContainer" style="display:none;"></div>
                 
                 <button class="btn" style="background:#94A3B8; margin-top:25px;" onclick="logout()">ออกจากระบบ</button>
             </div>
@@ -116,16 +114,13 @@
     </div>
 
     <script>
-        // ==========================================
-        // 🔴 1. ใส่ URL Web App ระบบคูปองที่นี่
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvbMGagD28gINmsuEVquagxgk8eFGoMLynAqlzu6OvnJAcDJh1bt2b3bincp6Y-o8/exec"; 
-        
-        // 🔴 2. ตั้งชื่อร้าน และ URL โลโก้
         const SHOP_NAME = "MIRA HAIR STUDIO";
         const LOGO_URL = ""; 
 
         let userPhone = "";
-        let globalMyCoupons = []; // เก็บอาร์เรย์คูปองของฉันไว้ใช้วาดแท็บ
+        let globalMyCoupons = []; 
+        let globalHistoryCoupons = []; // 🌟 อาร์เรย์ประวัติคูปองค้างเก่า
 
         window.onload = function() {
             document.getElementById('shopNameDisplay').innerText = SHOP_NAME;
@@ -135,46 +130,44 @@
                 logoImg.src = LOGO_URL; logoImg.style.display = "block";
                 document.getElementById('shopNameDisplay').style.display = "none"; 
             }
-            checkSession(); // เช็คว่าเคยล็อกอินไว้ไหม
+            checkSession(); 
         };
 
         function showLoading(show) { document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none'; }
 
-        // 🌟 ระบบจำ Session 10 นาที
         function checkSession() {
             let savedPhone = localStorage.getItem('mira_coupon_user');
             let savedTime = localStorage.getItem('mira_coupon_time');
             if(savedPhone && savedTime) {
                 let now = new Date().getTime();
-                if(now - parseInt(savedTime) < 10 * 60 * 1000) { // 10 นาที
+                if(now - parseInt(savedTime) < 10 * 60 * 1000) { 
+                    loggedInUser = savedPhone;
                     document.getElementById('txtPhone').value = savedPhone;
-                    fetchCoupons(savedPhone); // ล็อกอินอัตโนมัติ
+                    checkCoupons();
                     return;
                 }
             }
-            // ถ้าหมดเวลาให้เคลียร์ทิ้ง
-            localStorage.removeItem('mira_coupon_user');
-            localStorage.removeItem('mira_coupon_time');
-        }
-
-        function saveSession(phone) {
-            localStorage.setItem('mira_coupon_user', phone);
-            localStorage.setItem('mira_coupon_time', new Date().getTime().toString());
+            logout();
         }
 
         function logout() {
             localStorage.removeItem('mira_coupon_user');
             localStorage.removeItem('mira_coupon_time');
-            location.reload();
+            document.getElementById('loginZone').style.display = 'block';
+            document.getElementById('userInfoBox').style.display = 'none';
+            document.getElementById('couponZone').style.display = 'none';
         }
 
         function loginAction() {
             let phone = document.getElementById('txtPhone').value.trim();
             if(!phone || phone.length < 9) return alert("กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้องค่ะ");
-            fetchCoupons(phone);
+            localStorage.setItem('mira_coupon_user', phone);
+            localStorage.setItem('mira_coupon_time', new Date().getTime().toString());
+            checkCoupons();
         }
 
-        function fetchCoupons(phone) {
+        function checkCoupons() {
+            let phone = document.getElementById('txtPhone').value.trim();
             showLoading(true);
             userPhone = phone;
 
@@ -184,7 +177,8 @@
             }).then(r => r.json()).then(res => {
                 showLoading(false);
                 if(res.status === 'success') {
-                    saveSession(phone); // บันทึก Session สำเร็จ
+                    // ปรับตั้งเวลาเซสชันใหม่ให้ยืดไปอีก 10 นาทีทุกครั้งที่มีการเรียกคุยกับชีตสำเร็จ
+                    localStorage.setItem('mira_coupon_time', new Date().getTime().toString());
                     
                     document.getElementById('loginZone').style.display = 'none';
                     document.getElementById('userInfoBox').style.display = 'block';
@@ -193,9 +187,9 @@
                     document.getElementById('lblCustomerName').innerText = res.name;
                     document.getElementById('lblCustomerPoints').innerText = res.points.toLocaleString();
                     
-                    globalMyCoupons = res.myCoupons || []; // รับรายการคูปองของฉันมาเก็บไว้
+                    globalMyCoupons = res.myCoupons || []; 
+                    globalHistoryCoupons = res.historyCoupons || []; // 🌟 รับข้อมูลสถิติประวัติเก่ามาเก็บไว้วาดหน้ากระดาน
 
-                    // อัปเดตตัวเลขแจ้งเตือนบนแท็บ
                     let badge = document.getElementById('myCouponBadge');
                     if(globalMyCoupons.length > 0) {
                         badge.innerText = globalMyCoupons.length;
@@ -204,71 +198,68 @@
                         badge.style.display = 'none';
                     }
 
-                    // วาดคูปองทั้ง 2 แท็บ
                     renderAvailableCoupons(res.coupons, res.points);
                     renderMyCoupons();
+                    renderHistoryCoupons(); // 🌟 สั่งให้วาดกระดานประวัติ
                 } else {
                     alert(res.msg);
-                    logout(); // ล็อกอินไม่ผ่านให้ลบเซสชัน
+                    logout();
                 }
             }).catch(e => { showLoading(false); alert("การเชื่อมต่อล้มเหลว"); });
         }
 
         function switchTab(tab) {
+            document.getElementById('tabNew').classList.remove('active');
+            document.getElementById('tabMy').classList.remove('active');
+            document.getElementById('tabHistory').classList.remove('active');
+            document.getElementById('couponContainer').style.display = 'none';
+            document.getElementById('myCouponContainer').style.display = 'none';
+            document.getElementById('historyCouponContainer').style.display = 'none';
+            
             if(tab === 'new') {
                 document.getElementById('tabNew').classList.add('active');
-                document.getElementById('tabMy').classList.remove('active');
                 document.getElementById('couponContainer').style.display = 'grid';
-                document.getElementById('myCouponContainer').style.display = 'none';
-            } else {
+            } else if(tab === 'my') {
                 document.getElementById('tabMy').classList.add('active');
-                document.getElementById('tabNew').classList.remove('active');
                 document.getElementById('myCouponContainer').style.display = 'grid';
-                document.getElementById('couponContainer').style.display = 'none';
+            } else if(tab === 'history') {
+                document.getElementById('tabHistory').classList.add('active');
+                document.getElementById('historyCouponContainer').style.display = 'grid';
             }
         }
 
-        // วาดแท็บ "คูปองน่าสนใจ"
         function renderAvailableCoupons(coupons, currentPoints) {
             let container = document.getElementById('couponContainer');
             container.innerHTML = '';
-            
             if(coupons.length === 0) {
                 container.style.display = "block";
                 container.innerHTML = '<div style="text-align:center; color:#888; padding:30px; background:#fff; border-radius:12px; font-size:0.9rem;">ยังไม่มีคูปองใหม่ในขณะนี้</div>';
                 return;
             }
-
             container.style.display = "grid"; 
-
             coupons.forEach(cp => {
                 let canAfford = currentPoints >= cp.pointsRequired;
                 let isSoldOut = (cp.quota > 0 && cp.claimedCount >= cp.quota);
-                
                 let btnHtml = '';
                 if (isSoldOut) {
-                    btnHtml = `<button class="btn-claim btn-soldout">สิทธิ์เต็ม</button>`;
+                    btnHtml = `<button class="btn-claim btn-soldout" disabled>สิทธิ์เต็ม</button>`;
                 } else if (!canAfford && cp.pointsRequired > 0) {
                     btnHtml = `<button class="btn-claim" style="background:#E2E8F0; color:#94A3B8;" disabled>แต้มไม่พอ</button>`;
                 } else {
                     btnHtml = `<button class="btn-claim" onclick="claim('${cp.id}', ${cp.pointsRequired})">เก็บคูปอง</button>`;
                 }
-
                 let ptsLabel = cp.pointsRequired > 0 ? `ใช้ ${cp.pointsRequired} แต้ม` : 'รับฟรี';
                 let expiryLabel = cp.expiry !== "ไม่มีวันหมดอายุ" ? `หมดอายุ: ${cp.expiry}` : '';
-                
                 let quotaHtml = '';
                 if (cp.quota > 0) {
                     let percent = (cp.claimedCount / cp.quota) * 100;
                     if(percent > 100) percent = 100;
-                    let fillClass = percent >= 100 ? 'progress-fill full' : 'progress-fill';
                     quotaHtml = `
                         <div class="quota-box">
-                            <div class="quota-text"><span>รับแล้ว ${cp.claimedCount}</span><span>เหลือ ${cp.quota - cp.claimedCount}</span></div>
-                            <div class="progress-bar"><div class="${fillClass}" style="width: ${percent}%;"></div></div>
+                            <div class="quota-text"><span>แลกแล้ว ${cp.claimedCount}</span><span>เหลือ ${cp.quota - cp.claimedCount}</span></div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: ${percent}%;"></div></div>
                         </div>`;
                 }
-
                 container.innerHTML += `
                     <div class="coupon-item">
                         <img src="${cp.imgUrl}" class="coupon-img" onerror="this.src='https://placehold.co/300x200/F1F5F9/94A3B8?text=NO+IMAGE'">
@@ -284,32 +275,48 @@
             });
         }
 
-        // วาดแท็บ "คูปองของฉัน"
         function renderMyCoupons() {
             let container = document.getElementById('myCouponContainer');
             container.innerHTML = '';
-            
             if(globalMyCoupons.length === 0) {
                 container.style.display = "block";
                 container.innerHTML = '<div style="text-align:center; color:#888; padding:30px; background:#fff; border-radius:12px; font-size:0.9rem;">คุณยังไม่ได้เก็บคูปองค่ะ</div>';
                 return;
             }
-
             container.style.display = "grid"; 
-
             globalMyCoupons.forEach(cp => {
                 let expiryLabel = cp.expiry !== "ไม่มีวันหมดอายุ" ? `หมดอายุ: ${cp.expiry}` : '';
-                
-                // คูปองที่อยู่ในแท็บนี้ จะมีปุ่ม "กดใช้งานคูปอง"
                 container.innerHTML += `
-                    <div class="coupon-item" style="border-color: #D4AF37;">
+                    <div class="coupon-item" style="border-color: var(--accent);">
                         <img src="${cp.imgUrl}" class="coupon-img" onerror="this.src='https://placehold.co/300x200/F1F5F9/94A3B8?text=NO+IMAGE'">
                         <div class="coupon-body">
                             <div class="coupon-title">${cp.title}</div>
                             <div class="coupon-desc">${cp.desc}</div>
                             <div class="coupon-expiry">${expiryLabel}</div>
-                            
                             <button class="btn-use" onclick="useCoupon('${cp.id}')">กดใช้งานคูปอง</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        // 🌟 ฟังก์ชันวาดกระดานประวัติคูปองที่ใช้แล้ว (ทำเป็นภาพขาวดำ มินิมอลเรียบหรู)
+        function renderHistoryCoupons() {
+            let container = document.getElementById('historyCouponContainer');
+            container.innerHTML = '';
+            if(globalHistoryCoupons.length === 0) {
+                container.style.display = "block";
+                container.innerHTML = '<div style="text-align:center; color:#888; padding:30px; background:#fff; border-radius:12px; font-size:0.9rem;">ยังไม่มีประวัติการชำระหรือใช้คูปองค่ะ</div>';
+                return;
+            }
+            container.style.display = "grid"; 
+            globalHistoryCoupons.forEach(cp => {
+                container.innerHTML += `
+                    <div class="coupon-item" style="border-color: #CBD5E1; opacity: 0.65;">
+                        <img src="${cp.imgUrl}" class="coupon-img" style="filter: grayscale(100%);" onerror="this.src='https://placehold.co/300x200/F1F5F9/94A3B8?text=NO+IMAGE'">
+                        <div class="coupon-body" style="background:#F8FAFC;">
+                            <div class="coupon-title" style="color:#64748B;">${cp.title}</div>
+                            <div class="coupon-desc">${cp.desc}</div>
+                            <div style="font-size:0.7rem; color:#10B981; font-weight:600; margin-top:auto; padding-top:5px;">✔️ ใช้เมื่อ: ${cp.usedDate}</div>
                         </div>
                     </div>`;
             });
@@ -319,16 +326,14 @@
             if(pointsRequired > 0) {
                 if(!confirm(`ใช้ ${pointsRequired} แต้มสะสมเพื่อแลกคูปองนี้ ยืนยันหรือไม่?`)) return;
             }
-            saveSession(userPhone); // ต่ออายุเซสชันตอนทำรายการ
             showLoading(true);
-            
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 body: JSON.stringify({ action: 'claimCoupon', payload: { phone: userPhone, couponId: couponId, pointsRequired: pointsRequired } })
             }).then(r => r.json()).then(res => {
                 if(res.status === 'success') {
                     alert(res.msg);
-                    fetchCoupons(userPhone); // โหลดใหม่เพื่อย้ายคูปองไปอยู่แท็บของฉัน
+                    checkCoupons(); 
                 } else {
                     showLoading(false);
                     alert(res.msg);
@@ -336,20 +341,16 @@
             }).catch(e => { showLoading(false); alert("ทำรายการไม่สำเร็จ"); });
         }
 
-        // 🌟 ฟังก์ชันส่งคำสั่งใช้งานคูปองไปตัดสต๊อก
         function useCoupon(couponId) {
             if(!confirm(`⚠️ กรุณากดปุ่มนี้ต่อหน้าพนักงานที่ร้านเท่านั้น!\n\nคุณแน่ใจหรือไม่ว่าต้องการใช้งานคูปองนี้?`)) return;
-            
-            saveSession(userPhone);
             showLoading(true);
-
             fetch(SCRIPT_URL, {
                 method: 'POST',
                 body: JSON.stringify({ action: 'useCoupon', payload: { phone: userPhone, couponId: couponId } })
             }).then(r => r.json()).then(res => {
                 if(res.status === 'success') {
                     alert(res.msg);
-                    fetchCoupons(userPhone); // โหลดใหม่เพื่อให้คูปองนี้หายไปจากหน้าจอ
+                    checkCoupons(); 
                 } else {
                     showLoading(false);
                     alert(res.msg);
